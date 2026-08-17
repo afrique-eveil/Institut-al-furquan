@@ -546,64 +546,7 @@ src="https://www.facebook.com/tr?id=1347456590565762&ev=PageView&noscript=1"
   }, {threshold:.15});
   revealEls.forEach(el=>io.observe(el));
 
-  // ---- Meta Pixel : suivi des clics sur les boutons d'achat ----
-  document.querySelectorAll('a[href*="mychariow.shop"]').forEach(btn=>{
-    btn.addEventListener('click', ()=>{
-      if(typeof fbq === 'function'){ fbq('track', 'Lead'); }
-    });
-  });
-  document.querySelectorAll('.faq-q').forEach(btn=>{
-    btn.addEventListener('click', ()=>{
-      const item = btn.closest('.faq-item');
-      const answer = item.querySelector('.faq-a');
-      const isOpen = btn.getAttribute('aria-expanded') === 'true';
-
-      document.querySelectorAll('.faq-q').forEach(b=>{
-        b.setAttribute('aria-expanded','false');
-        b.closest('.faq-item').querySelector('.faq-a').style.maxHeight = null;
-      });
-
-      if(!isOpen){
-        btn.setAttribute('aria-expanded','true');
-        answer.style.maxHeight = answer.scrollHeight + 'px';
-      }
-    });
-  });
-
-  // ---- Conversion automatique du prix dans la devise locale du visiteur ----
-  (async function localizePrice(){
-    const PRICE_XOF = 4500;
-    const el = document.getElementById('local-price');
-    if(!el) return;
-    try{
-      const geoRes = await fetch('https://ipwho.is/');
-      const geo = await geoRes.json();
-      if(!geo || geo.success === false) throw new Error('geo lookup failed');
-      const currency = geo.currency_code;
-      const countryName = geo.country;
-
-      if(!currency || currency === 'XOF'){
-        el.remove();
-        return;
-      }
-
-      const rateRes = await fetch('https://open.er-api.com/v6/latest/XOF');
-      const rateData = await rateRes.json();
-      const rate = rateData && rateData.rates ? rateData.rates[currency] : null;
-      if(!rate) throw new Error('rate not found');
-
-      const converted = PRICE_XOF * rate;
-      const formatted = new Intl.NumberFormat(undefined, {
-        style:'currency', currency:currency, maximumFractionDigits: converted < 20 ? 2 : 0
-      }).format(converted);
-
-      el.textContent = `≈ ${formatted} · prix indicatif pour ${countryName} (taux du jour)`;
-      el.classList.remove('loading');
-    }catch(err){
-      // silencieux : si la détection/conversion échoue, on garde uniquement le prix en FCFA
-      el.remove();
-    }
-  })();
+  
 </script>
 
 </body>
